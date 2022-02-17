@@ -1,0 +1,28 @@
+# 상하좌우 
+# 시뮬레이션을 실행할 맵의 크기 입력받기
+n = int(input())
+# x와 y 값은 처음에 (1, 1)로 고정
+x, y = 1, 1
+# 어떤 방향으로 갈지에 대한 계획을 한칸씩 뛰고 입력
+plans = input().split()
+
+# 계획에 따른 방향 백터를 설정
+dx = [0, 0, -1, 1]
+dy = [-1, 1, 0, 0]
+move_types = ["L", "R", "U", "D"]
+
+# 이동개획을 하나씩 확인하기
+for plan in plans:
+    # 계획이 맞을 경우 좌표를 구하기
+    for i in range(len(move_types)):
+        if plan == move_types[i]:
+            nx = x + dx[i]
+            ny = y + dy[i]
+    # 좌표의 위치가 맵 이상 혹은 이하의 위치일 경우 무시
+    if nx < 1 or ny < 1 or nx > n or ny > n:
+        continue
+    # 좌표의 위치가 맵에서 수용가능한 위치인경우 이동을 수행
+    x, y = nx, ny
+
+# 모두 이동한 좌표를 출력
+print(x, y)
