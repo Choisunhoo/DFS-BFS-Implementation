@@ -1,0 +1,31 @@
+# baekjoon 1697 숭바꼭질 
+from collections import deque
+
+# BFS 알고리즘
+def bfs(N): 
+    # 큐 생성및 큐에 수빈이의 첫번째 위치를 넣어준다
+    queue = deque()
+    queue.append(N)   
+    while queue:
+        # 큐에 저장된 위치를 빼서 다른 객채로 넣어준다
+        n = queue.popleft()
+        # 큐에서 뺀 위치가 동생의 위치와 같은 경우 테이블에 저장된 거리를 반환 그리고 종료
+        if n == K:
+            return table[n]
+            break
+        
+        # 수빈이가 이동할 수 있는 경우의수 3개 -1, +1, *2 로 반복문을 만들어줌
+        for i in (n-1, n+1, n*2):
+            # 수빈이가 이동할 수 있는 경우에 수중 한번도 그 위치를 안갔거나 맵 안일경우 몇번을 이동해서 갔는지를 저장 및 큐에 넣어줌
+            if 0 <= i <= max and not table[i]:
+                table[i] = table[n] + 1
+                queue.append(i)
+
+# 한계값 설정
+max = 1000000
+# 수빈이와 동생의 위치를 입력
+N, K = map(int, input().split())
+# 배열을 최대수 만큼 생성을 한뒤 0으로 초기화
+table = [0] * (max +1)
+# 함수를 통한 결과 출력
+print(bfs(N))
