@@ -1,0 +1,79 @@
+# baekjoon 14502 연구소
+
+import sys 
+import copy
+from collections import deque
+
+input = sys.stdin.readline
+
+# 연구소의 바이러스가 퍼질 수 있는 방향 백터 설정
+dx = [-1, 1, 0, 0]
+dy = [0, 0, 1, -1]
+
+# 연구소의 크기 설정 
+n, m = map(int, input().split())
+# 연구소의 바이러스, 벽, 빈칸을 설정
+graph = []
+for _ in range(n):
+    graph.append(list(map(int, input().split())))
+
+# 결과 값을 초기화
+result = 0 
+# 큐 생성
+queue = deque()
+
+#
+def bfs():
+    # 결과 값을 전체로 해서 가져옴
+    global result
+    # 바이러스가 퍼지는 것을 입력하기 위해 연구소를 복사
+    graph_copy = copy.deepcopy(graph)
+    # 연구소에서 바이러스가 있는 장소는 큐에 저장
+    for i in range(n):
+        for j in range(m):
+            if graph_copy[i][j] == 2:
+                queue.append([i, j])
+    
+    # 바이러스가 더이상 확산 안될때 까지 반복
+    while queue:
+        # 바이러스의 좌표값을 가져옴
+        x, y = queue.popleft()
+        # 저장된 바이러스가 퍼질수 있는 방향 백터 값을 통한 반복문
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            # 지정된 위치가 맵을 안넘고 빈칸인 경우 바이러스에 감염 시킨후 큐에 저장
+            if 0 <= nx < n and 0 <= ny < m:
+                if graph_copy[nx][ny] == 0:
+                    graph_copy[nx][ny] = 2
+                    queue.append([nx, ny])
+    
+    # 안전한 구역의 개수를 초기화
+    cnt = 0 
+    # 연구소에서 안전한 구역의 개수를 더해줌
+    for i in graph_copy:
+        cnt += i.count(0)
+    # 각 재귀함수 에서 정해진 3개의 벽을 지정한 것 중에서 재일 안전한 공간이 많은 곳을 저장하기 위해서 max 사용
+    result = max(result, cnt)
+
+# 연구소에 벽을 3개 넣을 수 있는 재귀 함수 
+def wall_setting(x):
+    # 벽이 3개가 된 경우에는 bfs 함수를 가동
+    if x == 3:
+        bfs()
+        return
+    # 연구소의 모든 곳에서 0 인 곳에 재귀함수를 사용해서 벽을 만듬 
+    for i in range(n):
+        for j in range(m):
+            # 지정된 위치가 빈칸인 경우 벽을 새움
+            if graph[i][j] == 0:
+                graph[i][j] = 1
+                # 벽이 하나 새워질때 재귀함수 설정
+                wall_setting(x+1)
+                # 연구소를 다시 원상 복귀
+                graph[i][j] = 0 
+
+# 재귀함수를 통한 벽생성과 그 벽을 통한 안전한 구역을 구해주는 bfs 함수 시작 
+wall_setting(0)
+# 결과 출력
+print(result)
