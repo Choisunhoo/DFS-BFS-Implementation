@@ -1,0 +1,45 @@
+# baekjoon 4963 숨바꼭질 
+import sys
+input = sys.stdin.readline
+
+# DFS 알고리즘
+def dfs(x, y):
+    # 그래프를 넘어가는 위치일 경우에 False를 반환 
+    if  x <= -1 or x >= m or y <= -1 or y >= n:
+        return False 
+    # 지정된 위치가 땅일 경우에 0으로 바꿔주고 방향백터에 의거하여 재귀함수
+    if graph[x][y] == 1:
+        graph[x][y] = 0
+        for direction in directions:
+            nx = x + direction[0]
+            ny = y + direction[1]
+            dfs(nx, ny)
+        # 섬의 개수를 위해서 True를 반환
+        return True
+    # 그래프 안에있지만 지정된 위치가 바다인 경우에는 False를 반환
+    return False
+    
+# 주어진 입력값을 입력하기 전까지 테스트를 반복
+while True:
+    # 그래프의 크기를 입력
+    n, m = map(int, input().split())
+    # 그래프의 크기가 0 * 0 일 경우 반복문 종료
+    if n == 0 and m == 0: 
+        break 
+    # 그래프에 바다와 땅의 위치 지정
+    graph = [] 
+    for i in range(m):
+        location = list(map(int,input().split()))
+        graph.append(location)
+    
+    # 섬으로 인식될 수 있는 방향 백터를 설정
+    directions = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+    # 결과 값의 초기화
+    result = 0 
+    # 그래프의 모든 값을 dfs 함수를 통해서 섬의 수를 구함
+    for i in range(m):
+        for j in range(n):
+            if dfs(i, j) == True:
+                result += 1
+    #결과 출력
+    print(result)
