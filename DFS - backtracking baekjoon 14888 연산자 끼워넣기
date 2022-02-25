@@ -1,0 +1,43 @@
+#백트래킹 알고리즘 baekjoon 14888 연산자 끼워넣기
+ 
+import sys 
+input = sys.stdin.readline
+# 수의 개수를 입력
+N = int(input())
+# 수를 입력
+data = list(map(int, input().split()))
+# 수의 연산자의 종류를 입력 +, - , *, / 순으로
+four_rules = list(map(int, input().split()))
+
+# 최대값의 초기화 -10억, 최소값의 초기화 +10억
+maximum = -1e9
+minimum = 1e9
+
+# dfs 함수, 연산 횟수, 연산후 값, 더하기의 횟수, 빼기의 횟수, 곱하기의 횟수, 나누기의 횟수
+def dfs(cnt, tnt, plus, minus, multiply, divide):
+    # global을 통해서 최대값과 최소값을 지속적으로 변환 
+    global maximum, minimum
+    # 연산을 다 했을 경우 최소값과 최대값을 구해주고 반환
+    if cnt == N:
+        maximum = max(maximum, tnt)
+        minimum = min(minimum, tnt)
+        return
+    
+    # 더하기가 있는경우 + 연산을 해준후 연산횟수 추가, 더하기 연산 수행에 따른 횟수 감소
+    if plus:
+        dfs(cnt + 1, tnt + data[cnt], plus - 1, minus, multiply, divide)
+    # 빼기가 있는경우 - 연산을 해준후 연산횟수 추가, 빼기 연산 수행에 따른 횟수 감소
+    if minus:
+        dfs(cnt + 1, tnt - data[cnt], plus , minus - 1, multiply, divide)
+    # 곱하기가 있는경우 * 연산을 해준후 연산횟수 추가, 곱하기 연산 수행에 따른 횟수 감소
+    if multiply:
+        dfs(cnt + 1, tnt * data[cnt], plus , minus, multiply - 1, divide)
+    # 나누기가 있는경우 / 연산을 해준후 연산횟수 추가, 나누기 연산 수행에 따른 횟수 감소
+    if divide:
+        dfs(cnt + 1, int(tnt / data[cnt]), plus , minus, multiply, divide - 1)
+
+# 백트래킹을 시작함, 맨 첫번째 숫자가 있어서 수식이 가동가능 함으로 tnt 에 첫번째 숫자를 넣어 준후 연산 횟수 추가, 및 연산자들의 갯수를 통한 함수 시작
+dfs(1, data[0], four_rules[0], four_rules[1], four_rules[2], four_rules[3])
+# 결과 출력
+print(maximum)
+print(minimum)
