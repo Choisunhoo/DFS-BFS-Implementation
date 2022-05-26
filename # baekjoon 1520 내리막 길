@@ -1,0 +1,42 @@
+# baekjoon 1520 내리막 길 
+
+## 재귀의 깊이 한계치를 설정
+import sys 
+sys.setrecursionlimit(10 ** 8)
+input = sys.stdin.readline
+
+# 함수 생성 
+def dfs(x, y):
+    # 만약 x, y의 값이 도착지점에 도착하면 1을 반환
+    if x == m - 1 and y == n - 1:
+        return 1 
+    
+    # 만약 x,y가 방문한 적이 없다면 
+    if dp[x][y] == -1:
+        # dp 테이블을 0으로 바꾸고 방문여부를 기록해줌
+        dp[x][y] = 0
+        # 상하좌우로 방향백터를 사용해서 이동 
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            
+            # 만약 지도의 범위를 넘지 않고 이동할 곳이 원래 지점 보다 내리막인경우(작은경우)
+            if 0 <= nx < m and 0 <= ny < n and graph[x][y] > graph[nx][ny]:
+                # 방문여부 확인 x, y지점에 갈 수 있는 길을 추가 해줌
+                dp[x][y] += dfs(nx, ny)
+    
+    # 방문 여부 리스트의 x, y 좌표 값을 반환 
+    return dp[x][y]
+
+# 지도의 세로와 가로의 값을 입력 받음
+m, n = map(int, input().split())
+# 지도의 높낮이를 입력 받음
+graph = [list(map(int, input().split())) for _ in range(m)]
+# 방문여부와 몇 가지 길로 갈 수 있는지를 기록하는 dp 라는 이름의 리스트를 생성 
+dp = [[-1] * n for _ in range(m)]
+# 방향 백터 설정 
+dx = [1, -1, 0, 0]
+dy = [0, 0, -1, 1]
+
+# 함수 실행과 함께 결과 출력 
+print(dfs(0, 0))
