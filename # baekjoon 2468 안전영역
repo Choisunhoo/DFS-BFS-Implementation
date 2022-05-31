@@ -1,0 +1,75 @@
+# baekjoon 2468 안전영역
+
+# dfs 위해 deque 를 collections 에서 가져옴 
+from collections import deque
+
+# 지역의 크기 n*n을 입력 
+n = int(input())
+# 허용되는 최대 높이를 초기화 
+max_len = 0 
+# 결과 값 초기화 
+result = 0
+
+# 지역의 정보를 입력할 리스트 생성
+graph = [] 
+# n개만큼 반복
+for i in range(n): 
+    # i번째 지역 정보를 입력
+    data = list(map(int, input().split()))
+    # 반복문을 통해서 높이가 젤 높은 지역을 찾아줌 
+    for j in range(n):
+        if data[j] > max_len:
+            max_len = data[j]
+    # 지역 정보를 리스트에 추가 
+    graph.append(data)
+
+
+# dfs함수 생성 함수에는 탐색할 x,y의 좌표, 지정된 높이, 방문여부 확인 그래프를 넣어줌 
+def dfs(x, y, length, visited_graph):
+    # dfs를 위한 큐 생성 
+    queue = deque()
+    # 큐에 좌표 정보를 추가 
+    queue.append((x,y))
+    # 방문 여부 확인 그래프의 현재 위치를 갱신
+    visited_graph[x][y] = 1
+    # 4가지 방향백터 설정 
+    dx = [0, 1, 0, -1]
+    dy = [1, 0, -1, 0]
+    
+    # 큐에 원소가 사라질때까지 반복문 반복 
+    while queue:
+        # x, y좌표는 큐에서 pop을 통해서 가져옴 
+        x, y = queue.popleft()
+        # 4개의 방향만큼 반복 
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            # 이동하려는 좌표가 지도를 넘지 않은경우
+            if 0 <= nx < n and 0 <= ny < n:
+                # 방문 한적이 없고, 지정된 높이보다 높은경우
+                if visited_graph[nx][ny] == 0 and graph[nx][ny] > length:
+                    # 방문여부를 갱신
+                    visited_graph[nx][ny] = 1
+                    # 가려는 좌표를 큐에 넣어줌 
+                    queue.append((nx, ny))
+
+
+# 최대높이보다 -1 만큼 반복 
+for i in range(max_len):
+    # 높이를 설정할때마다 방문여부 그래프와 안전지역을 초기화 
+    visited_graph= [[0] * n for _ in range(n)]
+    cnt = 0 
+    # 안전지역을 탐색 
+    for j in range(n):
+        for k in range(n):
+            # 만약 현지역이 지정된 높이보다 높고 방문한적이 없는경우
+            if graph[j][k] > i and visited_graph[j][k] == 0:
+                # 안전지역 변수에 1을 추가
+                cnt += 1 
+                # dfs 함수의 x, y좌표, 지정된 높이, 방문여부 그래프를 넣어서 실행 
+                dfs(j, k, i, visited_graph)
+    # 결과값을 갱신 
+    result = max(result, cnt)
+
+# 결과 출력 
+print(result)            
