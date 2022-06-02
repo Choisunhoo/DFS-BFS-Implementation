@@ -1,0 +1,99 @@
+# baekjoon 구슬 탈출 2
+import sys 
+sys.stdin.readline 
+from collections import deque 
+
+# 가로와 세로값을 입력 
+n, m = map(int, input().split())
+# 보드 정보를 저장할 리스트 생성 
+graph = [] 
+# 반복문을 통해서 보드의 정보를 입력 및 빨간 구슬과 파란구슬의 위치를 찾음 
+for i in range(n):
+    data = list(input().rstrip())
+    for j in range(m):
+        if data[j] == "B":
+            bx, by = i, j 
+        elif data[j] == "R":
+            rx, ry = i, j
+    graph.append(data)
+    
+# 방문여부 확인을 위한 리스트 생성
+check = [[[[False] * m for _ in range(n)] for _ in range(m)] for _ in range(n)]
+
+answer = -1
+
+# 방향 백터 설정 
+dx = [0, 0, 1, -1]
+dy = [1, -1, 0, 0]
+
+# 기울이기 힘수 생성(좌표값과 기울이는 방향에 추가되는 좌표값)
+def lean(x, y, dx, dy):
+    # 빨강 구슬과 파랑구슬의 같은 위치 중복 방지를 위해 움직인 칸을 새는 변수 생성 
+    cnt = 0 
+    # 다음 위치가 벽이 아니거나 지금 위치가 구멍이 아닌경우에 계속 반복 
+    while graph[x + dx][y + dy] != "#" and graph[x][y] != "O":
+        x += dx
+        y += dy
+        cnt += 1 
+    # 반복문이 끝나면 최대로 갈 수 있는 위치와 움짐인 칸을 반환
+    return x, y, cnt
+
+# dfs 함수 생성 
+def dfs(rx, ry, bx, by, cnt):
+    global answer 
+    # 방문여부 갱신 
+    check[rx][ry][bx][by] = True 
+    # 큐 생성 
+    queue = deque()
+    # 큐에 빨간색과 파란색 구슬의 좌표를 넣어줌
+    queue.append((rx, ry, bx, by, cnt))
+    
+    # 큐에 원소가 없을때 까지 반복 
+    while queue:
+        # 빨간구슬과 파란구슬의 위치를 큐의 맨 앞에서 빼줌
+        rx, ry, bx, by, cnt = queue.popleft()
+        # 돌린 횟수가 10번이 넘는 경우 반복문 종료
+        if cnt > 10:
+            break 
+        
+        # 방향백터 4개만큼 반복문
+        for i in range(4):
+            # 이동하기 위해서 x,y좌표에 추가될 크기 저장  
+            nx = dx[i]
+            ny = dy[i]
+            # 빨강구슬과 파랑구슬의 기울이고난 뒤의 위치와 몇칸 이동했는지 거리를 기울이기 함수를 통해서 불러옴 
+            nrx, nry, rcnt = lean(rx, ry, nx, ny)
+            nbx, nby, bcnt = lean(bx, by, nx, ny)
+            # 실패조건(파란 구슬이 구멍에 안들어간경우)
+            if graph[nbx][nby] != "O":
+                # 성공조건(빨간 구슬이 구멍에 들어간 경우)
+                if graph[nrx][nry] == "O":
+                    # 정답 갱신 dfs 종료
+                    answer = cnt
+                    return
+                # 만약 빨강구슬과 파랑 구슬의 기운 뒤의 위치가 같으면 
+                if nrx == nbx and nry == nby:
+                    # 빨간 구슬이 더 많이간 경우 
+                    if rcnt > bcnt:
+                        # 빨간 구슬을 한칸 뒤로
+                        nrx -= nx
+                        nry -= ny
+                    # 파란 구슬이 더 많이간 경우
+                    elif rcnt < bcnt:
+                        # 파란구슬을 한칸 뒤로 
+                        nbx -= nx
+                        nby -= ny  
+                
+                # 방문여부를 확인해서 방문하지 않은 경우
+                if not check[nrx][nry][nbx][nby]:
+                    # 방문 여부를 갱신
+                    check[nrx][nry][nbx][nby] = True
+                    # 다음 탐색을 위해 이동한 위치 추가 
+                    queue.append((nrx, nry, nbx, nby, cnt+1))
+
+# dfs 실행 
+dfs(rx, ry, bx, by, 1)
+# 결과출력 
+print(answer)
+                    
+                    
